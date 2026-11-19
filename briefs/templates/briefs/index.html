@@ -1,0 +1,86 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief Generator · Collabstr</title>
+  <script>
+    // Apply a saved theme before first paint to avoid a light flash.
+    try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'briefs/app.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <span class="logo">collabstr</span>
+    <span class="topbar-tag">AI Brief Generator</span>
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">
+      <span class="icon-sun" aria-hidden="true">☀</span><span class="icon-moon" aria-hidden="true">☾</span>
+    </button>
+  </header>
+
+  <main class="layout">
+    <section class="panel panel-form">
+      <h1>Create a creator brief</h1>
+      <p class="muted">Tell us about your brand and campaign. We'll draft a brief you can edit and send to creators.</p>
+
+      <form id="brief-form" novalidate>
+        {% csrf_token %}
+        <div class="field">
+          <label for="brand_name">Brand name</label>
+          <input id="brand_name" name="brand_name" maxlength="80" placeholder="e.g. Glow Botanics" required>
+        </div>
+        {% for name, label, options in choice_groups %}
+        <fieldset class="field">
+          <legend>{{ label }}</legend>
+          <div class="pills">
+            {% for opt in options %}
+            <label class="pill"><input type="radio" name="{{ name }}" value="{{ opt }}"{% if forloop.first %} required{% endif %}><span>{{ opt }}</span></label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        {% endfor %}
+        <div class="field">
+          <label for="promoting">What are you promoting? <span class="optional">Optional</span></label>
+          <textarea id="promoting" name="promoting" rows="2" maxlength="300" placeholder="e.g. Our new vitamin C serum for sensitive skin, launching in March"></textarea>
+          <span class="hint">More detail here means fewer [TBD] gaps in the brief.</span>
+        </div>
+
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <button type="submit" class="btn btn-primary" id="generate-btn">Generate brief</button>
+      </form>
+    </section>
+
+    <section class="panel panel-brief" aria-live="polite">
+      <div class="empty" id="brief-empty">
+        <div class="empty-icon" aria-hidden="true">✦</div>
+        <p><strong>Your brief will appear here</strong></p>
+        <p class="muted">Every section is editable. Anything we couldn't know is marked <span class="tbd">[TBD: …]</span> for you to fill in.</p>
+      </div>
+
+      <div class="loading" id="brief-loading" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="muted">Drafting your brief…</p>
+      </div>
+
+      <article id="brief" hidden>
+        <div class="brief-toolbar">
+          <span class="tbd-count" id="tbd-count"></span>
+          <button type="button" class="btn btn-secondary" id="copy-btn">Copy brief</button>
+        </div>
+        <!-- One editing host for the whole brief so text can be selected across sections. -->
+        <div id="brief-doc" contenteditable="true" spellcheck="true" aria-label="Brief (editable)">
+          <h2 id="brief-title"></h2>
+          <div id="brief-sections"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="{% static 'briefs/app.js' %}"></script>
+</body>
+</html>
