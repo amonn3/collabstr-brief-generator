@@ -2,7 +2,7 @@
 
 A brand picks a platform, goal and tone, and gets a creator brief, content angles and creator selection criteria. It can edit the result in place and copy it into an offer.
 
-**Live:** _TBD_ · **Loom:** _TBD_
+**Live:** https://collabstr-brief-generator.vercel.app · **Loom:** _TBD_
 
 ---
 
